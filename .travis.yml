@@ -5,16 +5,22 @@ env:
   global:
     - GIT_SHA=$(git rev-parse HEAD)
 before_install:
+  # t=Run test
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker build -t pavlovelykyi/react-test -f ./client/Dockerfile.dev ./client
+  # Install kubectl
+  - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+  - chmod +x ./kubectl
+  - sudo mv ./kubectl /usr/local/bin/kubectl
+  - kubectl version --client
   # Prepare aws cli
   - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
   - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
   - export AWS_DEFAULT_REGION=us-west-2
-  - pip3 install awscli --upgrade --user
-  - export PATH=$PATH:$HOME/.local/bin
-  - aws eks --region us-west-2 update-kubeconfig --name multi-k8s
-#  Prepare test container
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker build -t pavlovelykyi/react-test -f ./client/Dockerfile.dev ./client
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - sudo ./aws/install
+  - aws eks --region us-east-2 update-kubeconfig --name esk-multi
 
 script:
   - docker run -e CI=true pavlovelykyi/react-test npm run test
