@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+env:
+  global:
+    - GIT_SHA=$(git rev-parse HEAD)
+before_install:
+  # Prepare aws cli
+  - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+  - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+  - export AWS_DEFAULT_REGION=us-west-2
+  - pip3 install awscli --upgrade --user
+  - export PATH=$PATH:$HOME/.local/bin
+  - aws eks --region us-west-2 update-kubeconfig --name multi-k8s
+#  Prepare test container
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker build -t pavlovelykyi/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true pavlovelykyi/react-test npm run test
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
