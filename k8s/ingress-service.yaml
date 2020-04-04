@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - devorcas.net
+        - react-app.devorcas.net
       secretName: devorcas-net
   rules:
-    - host: devorcas.net
+    - host: react-app.devorcas.net
       http:
         paths:
           - path: /?(.*)

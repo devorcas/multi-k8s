@@ -7,9 +7,9 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: devorcas.net
+  commonName: react-app.devorcas.net
   dnsNames:
-    - devorcas.net
+    - react-app.devorcas.net.
 #  acme:
 #    config:
 #      - http01:
